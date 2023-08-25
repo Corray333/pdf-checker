@@ -10,14 +10,14 @@ import (
 )
 
 type Config struct {
-	Env        string `yaml: "env" env-required:"true"`
+	Env        string `yaml:"env" env-default:"local"`
 	HTTPServer `yaml:"http_server"`
 }
 
 type HTTPServer struct {
-	Address     string        `yaml: "address" env-default:"127.0.0.1:3030"`
-	Timeout     time.Duration `yaml: "timeout" env-default:"4s"`
-	IdleTimeout time.Duration `yaml: "idle_timeout" env-default:"60s"`
+	Address     string        `yaml:"address" env-default:"127.0.0.1:3000"`
+	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
+	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
 }
 
 func MustLoad() *Config {
