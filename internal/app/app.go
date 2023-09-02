@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"testp/internal/config"
 	"testp/internal/database"
-	"testp/internal/handlers"
 	"testp/internal/logger"
+	"testp/internal/server"
 )
 
 type App struct {
@@ -24,7 +24,7 @@ func NewApp() *App {
 	app.DB = database.ConnectToDatabase()
 	app.Server = &http.Server{
 		Addr:         app.Config.Address,
-		Handler:      handlers.SetupRouter(),
+		Handler:      server.SetupRouter(),
 		ReadTimeout:  app.Config.Timeout,
 		WriteTimeout: app.Config.Timeout,
 		IdleTimeout:  app.Config.IdleTimeout,
