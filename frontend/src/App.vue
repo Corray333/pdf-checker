@@ -10,12 +10,11 @@
       </span>
     </div>
     <div class="content">
-      <label class="file-select" v-if="file != null">
+      <label class="file-select" v-if="file == null">
         <h1>Загрузите файл</h1>
         <!-- We can't use a normal button element here, as it would become the target of the label. -->
         <div class="select-button">
           <!-- Display the filename if a file has been selected. -->
-          <span >Selected File: {{ value.name }}</span>
           <span>+</span>
         </div>
         <!-- Now, the file input that we hide. -->
@@ -34,7 +33,7 @@
 import { ref } from "vue"
 // import pdf from 'pdfvuer'
 
-
+const filePath = ref(null)
 
 function uploadFile() {
   // Получаем элемент input
@@ -45,6 +44,8 @@ function uploadFile() {
     let formData = new FormData()
     // Добавляем файл в объект FormData
     formData.append("myFile", input.files[0])
+    filePath.value = input.files[0].filePath
+    console.log(filePath.value)
     console.log(input.files[0])
     // Создаем объект XMLHttpRequest
     let xhr = new XMLHttpRequest()
