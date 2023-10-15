@@ -4,7 +4,6 @@ import (
 	"log/slog"
 	"net/http"
 	"pdfchecker/internal/config"
-	"pdfchecker/internal/database"
 	"pdfchecker/internal/logger"
 	"pdfchecker/internal/server"
 )
@@ -12,7 +11,7 @@ import (
 type App struct {
 	*config.Config
 	Log *slog.Logger
-	*database.DB
+	// *database.DB
 	Server *http.Server
 }
 
@@ -21,7 +20,7 @@ func NewApp() *App {
 
 	app.Config = config.MustLoad()
 	app.Log = logger.SetupLogger(app.Env)
-	app.DB = database.ConnectToDatabase()
+	// app.DB = database.ConnectToDatabase()
 	app.Server = &http.Server{
 		Addr:         app.Config.Address,
 		Handler:      server.SetupRouter(app.Log),
