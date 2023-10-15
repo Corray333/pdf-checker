@@ -1,39 +1,46 @@
 <template>
   <main>
-    <div class="header">
-      <span class="logo-container">
-        <img src="./assets/logo.png" alt="" class="logo">
-        <div>
-          <p>OsaSoft</p>
-          <p>PDF Checker</p>
-        </div>
-      </span>
-    </div>
-    <div class="content">
-      <label class="file-select" v-if="file == null">
-        <h1>Загрузите файл</h1>
-        <!-- We can't use a normal button element here, as it would become the target of the label. -->
-        <div class="select-button">
-          <!-- Display the filename if a file has been selected. -->
-          <span>+</span>
-        </div>
-        <!-- Now, the file input that we hide. -->
-        <input id="fileInput" type="file" @change="uploadFile" />
-      </label>
-      <object v-else data="https://www.w3docs.com/uploads/media/default/0001/01/540cb75550adf33f281f29132dddd14fded85bfc.pdf" type="application/pdf"
-        width="100%" height="500px">
-        <p>Unable to display PDF file. <a
-            href="/uploads/media/default/0001/01/540cb75550adf33f281f29132dddd14fded85bfc.pdf">Download</a> instead.</p>
-      </object>
+    <div class="wrapper">
+      <div class="header">
+        <span class="logo-container">
+          <img src="./assets/logo.png" alt="" class="logo">
+          <div>
+            <p>OsaSoft</p>
+            <p>PDF Checker</p>
+          </div>
+        </span>
+        <a href="">Наши контакты</a>
+      </div>
+      <div class="content">
+        <Transition v-if="result == ''">
+          <label class="file-select">
+            <h1>Загрузите файл</h1>
+            <!-- We can't use a normal button element here, as it would become the target of the label. -->
+            <div class="select-button">
+              <!-- Display the filename if a file has been selected. -->
+              <span>+</span>
+            </div>
+            <!-- Now, the file input that we hide. -->
+            <input id="fileInput" type="file" @change="uploadFile" />
+          </label>
+        </Transition>
+        <Transition v-else>
+          <object :data="filePath" type="application/pdf" width="100%" height="400px" id="preview">
+            <p>Unable to display PDF file. <a
+                href="/uploads/media/default/0001/01/540cb75550adf33f281f29132dddd14fded85bfc.pdf">Download</a> instead.
+            </p>
+          </object>
+        </Transition>
+
+      </div>
     </div>
   </main>
 </template>
 
 <script setup>
 import { ref } from "vue"
-// import pdf from 'pdfvuer'
 
-const filePath = ref(null)
+const result = ref("")
 
 function uploadFile() {
   // Получаем элемент input
@@ -44,24 +51,15 @@ function uploadFile() {
     let formData = new FormData()
     // Добавляем файл в объект FormData
     formData.append("myFile", input.files[0])
-    filePath.value = input.files[0].filePath
-    console.log(filePath.value)
-    console.log(input.files[0])
     // Создаем объект XMLHttpRequest
     let xhr = new XMLHttpRequest()
     // Открываем соединение с сервером
-    xhr.open("POST", "/test")
+    xhr.open("POST", "/loadpdf")
     // Отправляем запрос с данными формы
     xhr.send(formData)
     // Обрабатываем ответ сервера
     xhr.onload = function () {
-      if (xhr.status == 200) {
-        // Выводим сообщение об успешной загрузке
-        alert("Файл успешно загружен на сервер")
-      } else {
-        // Выводим сообщение об ошибке
-        alert("Произошла ошибка при загрузке файла: " + xhr.statusText)
-      }
+      console.log(xhr.responseText)
     }
   } else {
     // Выводим сообщение, если файл не выбран
@@ -74,8 +72,38 @@ function uploadFile() {
 
 <style scoped>
 main {
-  padding: 0 250px;
+  padding: 25px 0;
+  padding: 0 350px;
   height: 100vh;
+  margin: 0;
+}
+.wrapper{
+  border: 4px solid var(--accent);
+  border-radius: 30px;
+  height: 100%;
+  width: 100%;
+}
+
+.header {
+  transform: scale(1.01) translateY(-1px);
+  border: 4px solid var(--accent);
+  background-color: var(--accent);
+  border-radius: 30px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header>a {
+  color: var(--black);
+  text-decoration: none;
+  transition: 0.2s ease-out;
+}
+
+.header>a:hover {
+  transform: scale(1.1);
+  transition: 0.2s ease-out;
 }
 
 .logo {

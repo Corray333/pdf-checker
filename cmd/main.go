@@ -1,7 +1,7 @@
 package main
 
 import (
-	"testp/internal/app"
+	"pdfchecker/internal/app"
 )
 
 func main() {
@@ -11,7 +11,7 @@ func main() {
 	app.Log.Info("Server is starting...")
 
 	if err := app.Server.ListenAndServe(); err != nil {
-		app.Log.Error("Server is not started")
+		app.Log.Error("Server is not started:", err)
 	}
 
 	app.Log.Error("Server is stopped")

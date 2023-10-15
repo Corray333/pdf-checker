@@ -28,8 +28,24 @@ def display(img):
 
 def binarization(image):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    thresh, im_bw = cv2.threshold(gray_image, 210, 230, cv2.THRESH_BINARY)
+    thresh, im_bw = cv2.threshold(gray_image, 210, 250, cv2.THRESH_BINARY)
     return im_bw
+
+
+def delete_sign_block(image):
+    # Преобразуйте изображение в цветовое пространство HSV
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Определите диапазон голубого цвета в цветовом пространстве HSV
+    lower_blue = np.array([90, 50, 50])
+    upper_blue = np.array([130, 255, 255])
+
+    # Создайте маску для голубого цвета
+    blue_mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
+
+    # Примените обратную маску для удаления голубого цвета
+    result_image = cv2.bitwise_and(image, image, mask=~blue_mask)
+    return result_image
 
 
 def noise_removal(image):
