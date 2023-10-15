@@ -17,7 +17,7 @@ func ErrorDetection(data string) []string {
 	case "FMU76":
 		return ErrorsFromFMU76(data)
 	}
-	return []string{"Wrong document type"}
+	return []string{"Неправильный тип документа"}
 }
 
 func ErrorsFromM11(data string) []string {

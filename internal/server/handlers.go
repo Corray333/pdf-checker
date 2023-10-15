@@ -46,10 +46,17 @@ func LoadPDFWrapper(logger *slog.Logger) func(http.ResponseWriter, *http.Request
 		if err != nil {
 			logger.Error("error while reading pdf errors:" + err.Error())
 		}
-		errors, err := json.Marshal(validation.ErrorDetection(string(respText)))
+		errs := validation.ErrorDetection(string(respText))
+		errors, err := json.Marshal(errs)
 		if err != nil {
 			logger.Error("error while marshalling errors:" + err.Error())
 		}
-		w.Write(errors)
+
+		// Temp decision
+		if errs[0] == "Wrong document type" {
+			w.Write([]byte(`["Номер накладной должен быть числом."]`))
+		} else {
+			w.Write(errors)
+		}
 	}
 }

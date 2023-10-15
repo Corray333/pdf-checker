@@ -2,18 +2,20 @@
   <main>
     <div class="wrapper">
       <div class="header">
-        <span class="logo-container">
+        <a href="/">
+          <span class="logo-container">
           <img src="./assets/logo.png" alt="" class="logo">
           <div>
             <p>OsaSoft</p>
             <p>PDF Checker</p>
           </div>
         </span>
+        </a>
         <a href="">Наши контакты</a>
       </div>
       <div class="content">
-        <Transition v-if="result == ''">
-          <label class="file-select">
+        <Transition>
+          <label class="file-select" v-if="result == ''">
             <h1>Загрузите файл</h1>
             <!-- We can't use a normal button element here, as it would become the target of the label. -->
             <div class="select-button">
@@ -24,14 +26,19 @@
             <input id="fileInput" type="file" @change="uploadFile" />
           </label>
         </Transition>
-        <Transition v-else>
-          <object :data="filePath" type="application/pdf" width="100%" height="400px" id="preview">
-            <p>Unable to display PDF file. <a
-                href="/uploads/media/default/0001/01/540cb75550adf33f281f29132dddd14fded85bfc.pdf">Download</a> instead.
-            </p>
-          </object>
+        <Transition>
+          <div v-if="result != ''" class="errors">
+            <!-- <object :data="filePath" type="application/pdf" width="100%" height="400px" id="preview">
+              <p>Unable to display PDF file. <a
+                  href="/uploads/media/default/0001/01/540cb75550adf33f281f29132dddd14fded85bfc.pdf">Download</a> instead.
+              </p>
+            </object> -->
+            <h2>Список ошибок:</h2>
+            <ul>
+              <li v-for="el in result">{{ el }}</li>
+            </ul>
+          </div>
         </Transition>
-
       </div>
     </div>
   </main>
@@ -60,6 +67,7 @@ function uploadFile() {
     // Обрабатываем ответ сервера
     xhr.onload = function () {
       console.log(xhr.responseText)
+      result.value = JSON.parse(xhr.responseText)
     }
   } else {
     // Выводим сообщение, если файл не выбран
@@ -71,13 +79,15 @@ function uploadFile() {
 </script>
 
 <style scoped>
+
 main {
-  padding: 25px 0;
-  padding: 0 350px;
+  overflow: hidden;
+  padding: 25px 350px;
   height: 100vh;
   margin: 0;
 }
-.wrapper{
+
+.wrapper {
   border: 4px solid var(--accent);
   border-radius: 30px;
   height: 100%;
@@ -156,6 +166,24 @@ label {
 /* Don't forget to hide the original file input! */
 .file-select>input[type="file"] {
   display: none;
+}
+
+ul{
+  list-style:inside;
+}
+.errors{
+  display: flex;
+  gap: 25px;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>
 
