@@ -3,11 +3,12 @@ from PIL import Image
 import cv2
 import prepocessing
 from pdf2image import convert_from_path
-import numpy as np
 from flask import Flask, request, jsonify
 import json
+import numpy as np
 
 pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
+
 
 def OCR_crop_info(image, info):
     """
@@ -23,7 +24,6 @@ def OCR_crop_info(image, info):
         coord = info[key][1]
         current_data = crop_create(image, coord)
         info[key][0] = current_data.replace("\n", " ")
-        info[key][0] = info[key][0][:-1]
         info[key] = info[key][0] # убираю координаты текстового блока
     return info
 
@@ -107,35 +107,36 @@ def preparation(image):
     return result
 
 
-def OCR_M11(input_path):
-    info_M11 = {
-        'order': ['', [2380, 420, 2790, 537]],
-        'organisation': ['', [845, 750, 3000, 840]],
-        'structpod': ['', [870, 850, 2980, 1120]],
-        'datacreate': ['', [510, 1530, 800, 1770]],
-        'optypecode': ['', [820, 1530, 1080, 1770]],
-        'sendertructpod': ['', [1100, 1530, 1550, 1770]],
-        'restructpod': ['', [1950, 1530, 2370, 1770]],
-        'throughwho': ['', [620, 1850, 2720, 2050]],
-        'zatreber': ['', [650, 2100, 2060, 2300]],
-        'razr': ['', [2430, 2100, 3830, 2300]]
+def process(fileName):
+
+    info = {
+    'Order': ['', [2380,420,2790,537]],
+    'Organisation': ['', [845,750,3000,840]],
+    'StructPod': ['', [870,850,2980,1120]],
+    'DataCreate': ['', [510,1530,800,1770]],
+    'OpTypeCode': ['', [820,1530,1080,1770]],
+    'SenderStructPod': ['', [1100,1530,1550,1770]],
+    'ReStructPod': ['', [1950,1530,2370,1770]],
+    'throughWho': ['', [620,1850,2720,2050]],
+    'Zatreber': ['', [650,2100,2060,2300]],
+    'Razr': ['', [2430,2100,3830,2300]]
     }
     """
     словарь, содержащий пустую строку и координаты текстого блока, соответсвующее конкретному полю документа
     """
-    pages = convert_from_path(input_path, 500, poppler_path="C:/Program Files/poppler-23.08.0/Library/bin") # конвертируем pdf постранично в jpg
+    pages = convert_from_path(fileName, 500) # конвертируем pdf постранично в jpg
 
+    print(fileName)
     cropped_image = pages[0].crop((0, 0, 4134, 2350)) # готовим временное изображение для заголовков
 
-    info_heading = OCR_crop_info(cropped_image, info_M11)
-    # creating json
-    json_file_path = "data.json"
-
-    with open(json_file_path, 'w', encoding="utf-8") as json_file:
-        json.dump(info_heading, json_file, ensure_ascii=False)
+    info_heading = OCR_crop_info(cropped_image, info)
     print(info_heading)
+    return info_heading
 
 
+
+
+# Создаем экземпляр приложения с именем app
 app = Flask(__name__)
 
 # Определяем декоратор для обработки POST-запросов по пути /post
@@ -146,12 +147,14 @@ def post_handler():
     # Проверяем, что данные не пустые   
     if data:
         # Возвращаем ответ в виде JSON с теми же данными и статусом 200 (успешно)
-        return OCR_M11(data["fileName"]), 200
+        return process(data["fileName"]), 200
     else:
         # Возвращаем ответ с сообщением об ошибке и статусом 400 (неверный запрос)
         return jsonify({'message': 'No data provided'}), 400
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=3031)
+
+
 
 
